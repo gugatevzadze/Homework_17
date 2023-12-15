@@ -1,6 +1,5 @@
 package com.example.homework_17.login
 
-import android.content.Context
 import android.view.View
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
@@ -14,6 +13,7 @@ import com.example.homework_17.BaseFragment
 import com.example.homework_17.R
 import com.example.homework_17.common.Resource
 import com.example.homework_17.databinding.FragmentLoginBinding
+import com.example.homework_17.datastore.DataStoreUtil
 import kotlinx.coroutines.launch
 
 class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::inflate) {
@@ -46,7 +46,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
             val password = binding.loginPassword.text.toString()
 
             //initiating the login process using the view model
-            viewModel.login(email, password, requireContext())
+            viewModel.login(email, password)
         }
 
         //navigating to the registration page
@@ -61,6 +61,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
             updateLoginButtonState(editable.toString())
         }
     }
+
     //function to bind observers for observing view model results
     override fun bindObservers() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -74,17 +75,20 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
                 }
             }
         }
+        //observe changes in user email
+        viewLifecycleOwner.lifecycleScope.launch {
+            DataStoreUtil.getUserEmail().collect { userEmail ->
+                if (userEmail.isNotEmpty()) {
+                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                }
+            }
+        }
     }
 
     //function to check if the user is already logged in and navigate to home
     private fun checkAndNavigateToHome() {
-        val sharedPreferences = requireContext().getSharedPreferences("user_session", Context.MODE_PRIVATE)
-        val userToken = sharedPreferences.getString("user_token", null)
-        if (!userToken.isNullOrEmpty()) {
-            findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-        }
+        viewModel.checkAndNavigateToHome()
     }
-
     //function to navigate to the registration page
     private fun navigateToRegisterPage() {
         findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
@@ -99,12 +103,11 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
 
     //function to handle the login
     private fun handleLoginSuccess(result: Resource.Success<LoginResponse>) {
-        //saving session if remember me is checked
-        if (binding.loginRememberMe.isChecked) {
-            saveUserTokenToSharedPreferences(result.data?.token)
+        viewLifecycleOwner.lifecycleScope.launch {
+            if (binding.loginRememberMe.isChecked) {
+                DataStoreUtil.saveUserEmail(result.data?.token ?: "")
+            }
         }
-        //navigating to the page
-        findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
     }
 
     //function to handle the login error
@@ -116,14 +119,5 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
     //function to handle the loading state
     private fun handleLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.INVISIBLE
-    }
-
-    //function to save the user token to SharedPreferences
-    private fun saveUserTokenToSharedPreferences(token: String?) {
-        val sharedPreferences = requireContext().getSharedPreferences("user_session", Context.MODE_PRIVATE)
-        with(sharedPreferences.edit()) {
-            putString("user_token", token)
-            apply()
-        }
     }
 }

@@ -1,19 +1,20 @@
 package com.example.homework_17.login
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.homework_17.common.Resource
+import com.example.homework_17.datastore.DataStoreUtil
 import com.example.homework_17.network.Network
 import com.example.homework_17.service.ApiService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
-import javax.net.ssl.SSLHandshakeException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import javax.net.ssl.SSLHandshakeException
 
 class LoginViewModel : ViewModel() {
 
@@ -25,13 +26,13 @@ class LoginViewModel : ViewModel() {
     private val apiService = Network.create(ApiService::class.java)
 
     //function to initiate login process
-    fun login(email: String, password: String, context: Context) {
+    fun login(email: String, password: String) {
         viewModelScope.launch {
             _loginResult.value = Resource.Loading(loading = true)
             try {
                 val response = apiService.login(LoginRequest(email, password))
                 _loginResult.value = Resource.Success(response)
-                saveUserEmailToSharedPreferences(email, context)
+                DataStoreUtil.saveUserEmail(email)
             } catch (e: HttpException) {
                 //handle HTTP error responses
                 _loginResult.value = Resource.Error("HTTP error: ${e.message()}")
@@ -54,13 +55,16 @@ class LoginViewModel : ViewModel() {
             _loginResult.value = Resource.Loading(loading = false)
         }
     }
-    //function to save the user email to SharedPreferences
-    private fun saveUserEmailToSharedPreferences(email: String, context: Context) {
-        val sharedPreferences = context.getSharedPreferences("user_session", Context.MODE_PRIVATE)
-        with(sharedPreferences.edit()) {
-            putString("user_email", email)
-            apply()
+    fun checkAndNavigateToHome() {
+        viewModelScope.launch {
+            val userEmail = DataStoreUtil.getUserEmail().first()
+            if (userEmail.isNotEmpty()) {
+                navigateToHome()
+            }
         }
+    }
+    private fun navigateToHome() {
+        _loginResult.value = Resource.Success(LoginResponse(token = "email"))
     }
 }
 
