@@ -1,5 +1,6 @@
 package com.example.homework_17.login
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.homework_17.common.Resource
@@ -8,7 +9,6 @@ import com.example.homework_17.network.Network
 import com.example.homework_17.service.ApiService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -26,7 +26,7 @@ class LoginViewModel : ViewModel() {
     private val apiService = Network.create(ApiService::class.java)
 
     //function to initiate login process
-    fun login(email: String, password: String) {
+    fun login(email: String, password: String, context: Context) {
         viewModelScope.launch {
             _loginResult.value = Resource.Loading(loading = true)
             try {
@@ -55,17 +55,17 @@ class LoginViewModel : ViewModel() {
             _loginResult.value = Resource.Loading(loading = false)
         }
     }
-    fun checkAndNavigateToHome() {
+    //function to save the user email in dataStore
+    fun saveUserEmailToDataStore(email: String) {
         viewModelScope.launch {
-            val userEmail = DataStoreUtil.getUserEmail().first()
-            if (userEmail.isNotEmpty()) {
-                navigateToHome()
-            }
+            DataStoreUtil.saveUserEmail(email)
         }
     }
-    private fun navigateToHome() {
-        _loginResult.value = Resource.Success(LoginResponse(token = "email"))
+    //function to save the user token in dataStore
+    fun saveUserTokenToDataStore(token: String?) {
+        viewModelScope.launch {
+            DataStoreUtil.saveUserToken(token ?: "")
+        }
     }
 }
-
 

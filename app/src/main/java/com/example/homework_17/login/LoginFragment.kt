@@ -14,6 +14,7 @@ import com.example.homework_17.R
 import com.example.homework_17.common.Resource
 import com.example.homework_17.databinding.FragmentLoginBinding
 import com.example.homework_17.datastore.DataStoreUtil
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::inflate) {
@@ -46,7 +47,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
             val password = binding.loginPassword.text.toString()
 
             //initiating the login process using the view model
-            viewModel.login(email, password)
+            viewModel.login(email, password, requireContext())
         }
 
         //navigating to the registration page
@@ -75,20 +76,18 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
                 }
             }
         }
-        //observe changes in user email
-        viewLifecycleOwner.lifecycleScope.launch {
-            DataStoreUtil.getUserEmail().collect { userEmail ->
-                if (userEmail.isNotEmpty()) {
-                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-                }
-            }
-        }
     }
 
     //function to check if the user is already logged in and navigate to home
     private fun checkAndNavigateToHome() {
-        viewModel.checkAndNavigateToHome()
+        viewLifecycleOwner.lifecycleScope.launch {
+            val userToken = DataStoreUtil.getUserToken().firstOrNull()
+            if (!userToken.isNullOrEmpty()) {
+                findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+            }
+        }
     }
+
     //function to navigate to the registration page
     private fun navigateToRegisterPage() {
         findNavController().navigate(R.id.action_loginFragment_to_registerFragment)
@@ -103,11 +102,13 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
 
     //function to handle the login
     private fun handleLoginSuccess(result: Resource.Success<LoginResponse>) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            if (binding.loginRememberMe.isChecked) {
-                DataStoreUtil.saveUserEmail(result.data?.token ?: "")
-            }
+        //saving session if remember me is checked
+        if (binding.loginRememberMe.isChecked) {
+            viewModel.saveUserTokenToDataStore(result.data?.token)
+            viewModel.saveUserEmailToDataStore(binding.loginEmail.text.toString())
         }
+        //navigating to the page
+        findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
     }
 
     //function to handle the login error

@@ -7,10 +7,15 @@ import com.example.homework_17.BaseFragment
 import com.example.homework_17.R
 import com.example.homework_17.databinding.FragmentHomeBinding
 import com.example.homework_17.datastore.DataStoreUtil
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::inflate) {
+
+    //initializing the shared preferences using lazy
+    private val sharedPreferences by lazy {
+        requireContext().getSharedPreferences("user_session", Context.MODE_PRIVATE)
+    }
 
     override fun setUp() {
         //displaying the users email address when the fragment is set up
@@ -20,29 +25,26 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     override fun onClickListeners() {
         //click listener for the logout button
         binding.buttonLogout.setOnClickListener {
-            //logout and navigating to the login screen
             logoutAndNavigateToLogin()
         }
     }
 
-    override fun bindObservers() {}
-
+    override fun bindObservers() {
+        displayUserEmail()
+    }
     //displaying the users email
     private fun displayUserEmail() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val userEmail = DataStoreUtil.getUserEmail().first()
+            val userEmail = DataStoreUtil.getUserEmail().firstOrNull()
             binding.homeEmail.text = "Email: $userEmail"
         }
     }
-
     //logout and navigating to the login screen
     private fun logoutAndNavigateToLogin() {
         viewLifecycleOwner.lifecycleScope.launch {
-            // Clearing the user session data in DataStore
-            DataStoreUtil.saveUserEmail("")
-            // Navigating to the login
+            //clearing the user data in DataStore
+            DataStoreUtil.clearUserData()
             findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
         }
     }
-
 }
