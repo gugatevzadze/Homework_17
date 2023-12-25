@@ -1,4 +1,4 @@
-package com.example.homework_17.login
+package com.example.homework_17.presentation.login
 
 import android.view.View
 import android.widget.Toast
@@ -11,12 +11,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.homework_17.BaseFragment
 import com.example.homework_17.R
-import com.example.homework_17.common.Resource
+import com.example.homework_17.data.common.Resource
 import com.example.homework_17.databinding.FragmentLoginBinding
 import com.example.homework_17.datastore.DataStoreUtil
+import com.example.homework_17.domain.login.LoginResponse
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::inflate) {
 
     private val viewModel: LoginViewModel by viewModels()
@@ -47,7 +50,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(FragmentLoginBinding::i
             val password = binding.loginPassword.text.toString()
 
             //initiating the login process using the view model
-            viewModel.login(email, password, requireContext())
+            viewModel.login(email, password)
         }
 
         //navigating to the registration page

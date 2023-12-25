@@ -1,4 +1,4 @@
-package com.example.homework_17.register
+package com.example.homework_17.presentation.register
 
 import android.view.View
 import android.widget.Toast
@@ -11,10 +11,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.homework_17.BaseFragment
-import com.example.homework_17.common.Resource
+import com.example.homework_17.data.common.Resource
 import com.example.homework_17.databinding.FragmentRegisterBinding
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterBinding::inflate) {
 
     private val viewModel: RegisterViewModel by viewModels()
