@@ -16,9 +16,10 @@ import java.net.UnknownHostException
 import javax.inject.Inject
 import javax.net.ssl.SSLHandshakeException
 
-class RegisterRepositoryImpl@Inject constructor(private val registerService: RegisterService,
-                                                private val dataStoreUtil: DataStoreUtil
-): RegisterRepository {
+class RegisterRepositoryImpl @Inject constructor(
+    private val registerService: RegisterService,
+    private val dataStoreUtil: DataStoreUtil
+) : RegisterRepository {
     override suspend fun register(
         username: String,
         password: String
@@ -33,7 +34,7 @@ class RegisterRepositoryImpl@Inject constructor(private val registerService: Reg
                 dataStoreUtil.saveUserEmail(username)
             } catch (e: HttpException) {
                 //handle HTTP error responses
-               emit(Resource.Error("HTTP error: ${e.message()}"))
+                emit(Resource.Error("HTTP error: ${e.message()}"))
             } catch (e: SSLHandshakeException) {
                 //handle SSL handshake errors
                 emit(Resource.Error("SSL handshake error: ${e.message}"))

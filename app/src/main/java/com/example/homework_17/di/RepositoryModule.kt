@@ -25,13 +25,22 @@ object RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideLoginRepository(loginService: LoginService, dataStoreUtil: DataStoreUtil): LoginRepository {
+    fun provideLoginRepository(
+        loginService: LoginService,
+        dataStoreUtil: DataStoreUtil
+    ): LoginRepository {
         return LoginRepositoryImpl(loginService = loginService, dataStoreUtil = dataStoreUtil)
     }
 
     @Singleton
     @Provides
-    fun provideRegisterRepository(registerService: RegisterService, dataStoreUtil: DataStoreUtil): RegisterRepository {
-        return RegisterRepositoryImpl(registerService = registerService, dataStoreUtil = dataStoreUtil)
+    fun provideRegisterRepository(
+        registerService: RegisterService,
+        dataStoreUtil: DataStoreUtil
+    ): RegisterRepository {
+        return RegisterRepositoryImpl(
+            registerService = registerService,
+            dataStoreUtil = dataStoreUtil
+        )
     }
 }

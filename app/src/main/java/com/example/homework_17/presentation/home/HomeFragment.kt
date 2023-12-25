@@ -1,4 +1,4 @@
-package com.example.homework_17.home
+package com.example.homework_17.presentation.home
 
 import android.content.Context
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +32,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
     override fun bindObservers() {
         displayUserEmail()
     }
+
     //displaying the users email
     private fun displayUserEmail() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -39,6 +40,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::infl
             binding.homeEmail.text = "Email: $userEmail"
         }
     }
+
     //logout and navigating to the login screen
     private fun logoutAndNavigateToLogin() {
         viewLifecycleOwner.lifecycleScope.launch {

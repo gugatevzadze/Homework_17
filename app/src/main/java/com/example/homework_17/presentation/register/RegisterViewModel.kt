@@ -17,17 +17,23 @@ class RegisterViewModel @Inject constructor(
 ) : ViewModel() {
 
     //current state of the register operation
-    private val _registerResult = MutableStateFlow<Resource<RegisterResponse>>(Resource.Loading(loading = false))
+    private val _registerResult =
+        MutableStateFlow<Resource<RegisterResponse>>(Resource.Loading(loading = false))
     val registerResult: StateFlow<Resource<RegisterResponse>> get() = _registerResult
 
     //function to initiate register process
     fun register(email: String, password: String) {
         viewModelScope.launch {
-            registerRepository.register(email, password).collect{
-                when(it) {
-                    is Resource.Success -> _registerResult.value = Resource.Success(data = it.data!!)
-                    is Resource.Error -> _registerResult.value = Resource.Error(errorMessage = it.errorMessage!!)
-                    is Resource.Loading -> _registerResult.value = Resource.Loading(loading = it.loading)
+            registerRepository.register(email, password).collect {
+                when (it) {
+                    is Resource.Success -> _registerResult.value =
+                        Resource.Success(data = it.data!!)
+
+                    is Resource.Error -> _registerResult.value =
+                        Resource.Error(errorMessage = it.errorMessage!!)
+
+                    is Resource.Loading -> _registerResult.value =
+                        Resource.Loading(loading = it.loading)
                 }
             }
         }

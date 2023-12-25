@@ -79,7 +79,8 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>(FragmentRegisterB
         val isEmailValid = isValidEmail(binding.registerEmail.text.toString())
         val isPasswordNotEmpty = binding.registerPassword.text!!.isNotEmpty()
         val isRepeatPasswordNotEmpty = binding.registerRepeatPassword.text!!.isNotEmpty()
-        binding.registerBtn.isEnabled = isEmailValid && isPasswordNotEmpty && isRepeatPasswordNotEmpty
+        binding.registerBtn.isEnabled =
+            isEmailValid && isPasswordNotEmpty && isRepeatPasswordNotEmpty
     }
 
     //function to show a toast message

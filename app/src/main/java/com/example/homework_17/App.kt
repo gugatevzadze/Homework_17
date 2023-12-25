@@ -4,11 +4,11 @@ import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class App:Application() {
+class App : Application() {
 
-    companion object{
+    companion object {
         lateinit var application: Application
-        private set
+            private set
     }
 
     override fun onCreate() {

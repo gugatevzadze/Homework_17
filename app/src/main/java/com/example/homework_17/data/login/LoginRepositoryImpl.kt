@@ -16,14 +16,16 @@ import java.net.UnknownHostException
 import javax.inject.Inject
 import javax.net.ssl.SSLHandshakeException
 
-class LoginRepositoryImpl @Inject constructor(private val loginService: LoginService,
-                                              private val dataStoreUtil: DataStoreUtil
-): LoginRepository {
-    override suspend fun login(email: String, password: String): Flow<Resource<LoginResponse>>{
+class LoginRepositoryImpl @Inject constructor(
+    private val loginService: LoginService,
+    private val dataStoreUtil: DataStoreUtil
+) : LoginRepository {
+    override suspend fun login(email: String, password: String): Flow<Resource<LoginResponse>> {
         return flow {
             emit(Resource.Loading(loading = true))
             try {
-                val response: Response<LoginResponseDto> = loginService.login(LoginRequest(email, password))
+                val response: Response<LoginResponseDto> =
+                    loginService.login(LoginRequest(email, password))
                 emit(Resource.Success(data = response.body()!!.toDomain()))
                 dataStoreUtil.saveUserEmail(email)
             } catch (e: HttpException) {

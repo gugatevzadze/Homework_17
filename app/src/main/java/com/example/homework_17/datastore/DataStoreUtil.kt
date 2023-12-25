@@ -40,6 +40,7 @@ object DataStoreUtil {
             preferences[EMAIL] ?: ""
         }
     }
+
     suspend fun clearUserData() {
         App.application.applicationContext.dataStore.edit { preferences ->
             preferences[EMAIL] = ""

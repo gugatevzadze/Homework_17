@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp"
-    tools:context=".home.HomeFragment">
+    tools:context=".presentation.home.HomeFragment">
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/homeEmail"
